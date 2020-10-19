@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="io.renren.modules.meeting.dao.MeetRoomDao">
+
+	<!-- 可根据自己的需求，是否要使用 -->
+    <resultMap type="io.renren.modules.meeting.entity.MeetRoomEntity" id="meetRoomMap">
+        <result property="roomId" column="room_id"/>
+        <result property="roomName" column="room_name"/>
+        <result property="roomArea" column="room_area"/>
+        <result property="location" column="location"/>
+        <result property="equipment" column="equipment"/>
+        <result property="capacity" column="capacity"/>
+        <result property="roomLeader" column="room_leader"/>
+        <result property="roomPhone" column="room_phone"/>
+        <result property="data1" column="data1"/>
+        <result property="data2" column="data2"/>
+    </resultMap>
+
+
+</mapper>
