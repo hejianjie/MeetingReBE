@@ -1,8 +1,14 @@
 package io.renren.modules.meeting.controller;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import io.renren.modules.meeting.entity.MeetMEEntity;
+import io.renren.modules.meeting.entity.MeetRoomEquipmentEntity;
+import io.renren.modules.meeting.service.MeetMEService;
+import io.renren.modules.meeting.service.MeetRoomEquipmentService;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,6 +36,10 @@ import io.renren.common.utils.R;
 public class MeetRoomController {
     @Autowired
     private MeetRoomService meetRoomService;
+    @Autowired
+    private MeetRoomEquipmentService meetRoomEquipmentService;
+    @Autowired
+    private MeetMEService meetMEService;
 
     /**
      * 列表
@@ -50,8 +60,18 @@ public class MeetRoomController {
     @RequiresPermissions("meeting:meetroom:info")
     public R info(@PathVariable("roomId") Integer roomId){
 		MeetRoomEntity meetRoom = meetRoomService.getById(roomId);
+        List<MeetRoomEquipmentEntity> eqIdList=meetRoomEquipmentService.list();
+        return R.ok().put("meetRoom", meetRoom).put("meetRoom", meetRoom);
+    }
 
-        return R.ok().put("meetRoom", meetRoom);
+    /**
+     * 设备列表
+     */
+    @RequestMapping("/eqlist")
+    @RequiresPermissions("meeting:meetroom:info")
+    public R eqlist(){
+        List<MeetRoomEquipmentEntity> eqList=meetRoomEquipmentService.list();
+        return R.ok().put("eqList", eqList);
     }
 
     /**
@@ -61,7 +81,19 @@ public class MeetRoomController {
     @RequiresPermissions("meeting:meetroom:save")
     public R save(@RequestBody MeetRoomEntity meetRoom){
 		meetRoomService.save(meetRoom);
-
+        String[] eqlist= meetRoomService.getById( meetRoom.getRoomId()).getEquipment().split(",");
+        QueryWrapper<MeetMEEntity> qe=new QueryWrapper<>();
+        qe.eq("r_id",meetRoom.getRoomId());
+        meetMEService.remove(qe);
+        for(int i=0;i<eqlist.length;i++)
+        {
+            QueryWrapper<MeetRoomEquipmentEntity> qe1=new QueryWrapper<>();
+            qe1.eq("name",eqlist[i]);
+            MeetMEEntity a=new MeetMEEntity();
+            a.setRId( meetRoom.getRoomId());
+            a.setEId(meetRoomEquipmentService.getOne(qe1).getId());
+            meetMEService.save(a);
+        }
         return R.ok();
     }
 
@@ -73,6 +105,19 @@ public class MeetRoomController {
     public R update(@RequestBody MeetRoomEntity meetRoom){
 		meetRoomService.updateById(meetRoom);
 
+        String[] eqlist= meetRoomService.getById( meetRoom.getRoomId()).getEquipment().split(",");
+        QueryWrapper<MeetMEEntity> qe=new QueryWrapper<>();
+        qe.eq("r_id",meetRoom.getRoomId());
+        meetMEService.remove(qe);
+        for(int i=0;i<eqlist.length;i++)
+        {
+            QueryWrapper<MeetRoomEquipmentEntity> qe1=new QueryWrapper<>();
+            qe1.eq("name",eqlist[i]);
+            MeetMEEntity a=new MeetMEEntity();
+            a.setRId( meetRoom.getRoomId());
+            a.setEId(meetRoomEquipmentService.getOne(qe1).getId());
+            meetMEService.save(a);
+        }
         return R.ok();
     }
 
@@ -83,6 +128,12 @@ public class MeetRoomController {
     @RequiresPermissions("meeting:meetroom:delete")
     public R delete(@RequestBody Integer[] roomIds){
 		meetRoomService.removeByIds(Arrays.asList(roomIds));
+		for(int i=0;i<Arrays.asList(roomIds).size();i++)
+        {
+            QueryWrapper<MeetMEEntity> qe=new QueryWrapper<>();
+            qe.eq("r_id",Arrays.asList(roomIds).get(i));
+            meetMEService.remove(qe);
+        }
 
         return R.ok();
     }

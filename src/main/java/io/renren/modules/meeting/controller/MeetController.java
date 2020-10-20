@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.renren.modules.meeting.entity.MeetRoomEntity;
 import io.renren.modules.meeting.service.MeetRoomService;
 import io.renren.modules.sys.entity.SysUserEntity;
+import io.renren.modules.sys.service.SysUserService;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,8 @@ public class MeetController {
     private MeetService meetService;
     @Autowired
     private MeetRoomService meetRoomService;
+    @Autowired
+    private SysUserService sysUserService;
 
 
     /**
@@ -56,6 +59,7 @@ public class MeetController {
 
         SysUserEntity user_now = (SysUserEntity) SecurityUtils.getSubject().getPrincipal();
 
+
         List<MeetRoomEntity> room = meetRoomService.list();
 
         List<Map<String, Object>> table = new ArrayList<>();
@@ -67,7 +71,7 @@ public class MeetController {
             Map map = new HashMap();
             for (int j = 0; j < room.size(); j++) {
                 if (j != 0) {
-                    map.put(room.get(j).getRoomName(), room.get(j));
+                    map.put(room.get(j-1).getRoomName(), room.get(j-1));
                 } else {
                     map.put("date", i + ":00-" + (i + 1) + ":00");
                 }

@@ -54,11 +54,18 @@ public class SysUserEntity implements Serializable {
 	 */
 	private String salt;
 
+	private String department;
+
+	private String thename;
+
+	private String data1;
+
+	private String data2;
 	/**
 	 * 邮箱
 	 */
-	@NotBlank(message="邮箱不能为空", groups = {AddGroup.class, UpdateGroup.class})
-	@Email(message="邮箱格式不正确", groups = {AddGroup.class, UpdateGroup.class})
+//	@NotBlank(message="邮箱不能为空", groups = {AddGroup.class, UpdateGroup.class})
+//	@Email(message="邮箱格式不正确", groups = {AddGroup.class, UpdateGroup.class})
 	private String email;
 
 	/**
