@@ -1,5 +1,6 @@
 package io.renren.modules.meeting.service.impl;
 
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import java.util.Map;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -18,9 +19,13 @@ public class MeetServiceImpl extends ServiceImpl<MeetDao, MeetEntity> implements
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
+        String key = (String)params.get("key");
         IPage<MeetEntity> page = this.page(
                 new Query<MeetEntity>().getPage(params),
                 new QueryWrapper<MeetEntity>()
+                        .like(StringUtils.isNotBlank(key),"room_user", key)
+                        .isNotNull("room_name")
+
         );
 
         return new PageUtils(page);
