@@ -16,5 +16,7 @@ import java.util.Map;
 public interface MeetService extends IService<MeetEntity> {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    PageUtils queryHistoryPage(Map<String, Object> params);
 }
 

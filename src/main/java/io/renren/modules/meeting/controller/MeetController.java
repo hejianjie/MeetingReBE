@@ -6,7 +6,11 @@ import java.util.*;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.renren.modules.meeting.entity.MeetRoomEntity;
 import io.renren.modules.meeting.service.MeetRoomService;
+import io.renren.modules.sys.entity.SysRoleEntity;
 import io.renren.modules.sys.entity.SysUserEntity;
+import io.renren.modules.sys.entity.SysUserRoleEntity;
+import io.renren.modules.sys.service.SysRoleService;
+import io.renren.modules.sys.service.SysUserRoleService;
 import io.renren.modules.sys.service.SysUserService;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
@@ -37,7 +41,8 @@ public class MeetController {
     private MeetRoomService meetRoomService;
     @Autowired
     private SysUserService sysUserService;
-
+    @Autowired
+    private SysUserRoleService sysUserRoleService;
 
     /**
      * 列表
@@ -45,8 +50,35 @@ public class MeetController {
     @RequestMapping("/list")
     @RequiresPermissions("meeting:meet:list")
     public R list(@RequestParam Map<String, Object> params) {
-        PageUtils page = meetService.queryPage(params);
+        SysUserEntity user_now = (SysUserEntity) SecurityUtils.getSubject().getPrincipal();
+        QueryWrapper<SysUserRoleEntity> qe=new QueryWrapper<>();
+        qe.eq("user_id",user_now.getUserId());
 
+        if(!(user_now.getUsername().equals("admin"))&& sysUserRoleService.getOne(qe).getRoleId()!=1)
+        {
+            params.put("name",user_now.getThename());
+        }
+        PageUtils page = meetService.queryPage(params);
+        return R.ok().put("page", page);
+
+    }
+
+
+    /**
+     * 历史列表
+     */
+    @RequestMapping("/historylist")
+    @RequiresPermissions("meeting:meet:list")
+    public R historylist(@RequestParam Map<String, Object> params) {
+        SysUserEntity user_now = (SysUserEntity) SecurityUtils.getSubject().getPrincipal();
+        QueryWrapper<SysUserRoleEntity> qe=new QueryWrapper<>();
+        qe.eq("user_id",user_now.getUserId());
+
+        if(!(user_now.getUsername().equals("admin"))&& sysUserRoleService.getOne(qe).getRoleId()!=1)
+        {
+            params.put("name",user_now.getThename());
+        }
+        PageUtils page = meetService.queryHistoryPage(params);
         return R.ok().put("page", page);
     }
 
