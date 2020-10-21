@@ -1,5 +1,6 @@
 package io.renren.modules.meeting.controller;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -44,19 +45,64 @@ public class MeetController {
     @Autowired
     private SysUserRoleService sysUserRoleService;
 
+
+    public void deal() {
+        Date date = new Date();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        String datestring = format.format(date);
+        QueryWrapper<MeetEntity> qeqe = new QueryWrapper<>();
+        qeqe.eq("status", "已申请");
+        List<MeetEntity> list = meetService.list(qeqe);
+
+        for (int i = 0; i < list.size(); i++) {
+            MeetEntity a = list.get(i);
+            Long deal=0l;
+            String hour = "";
+            if (Integer.parseInt(a.getStartTime()) < 10)
+                hour = "0" + a.getStartTime();
+            else hour = a.getStartTime();
+            String createTime = a.getDate() + " " + hour + ":00:00";
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            try {
+                 deal = sdf.parse(createTime).getTime();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            Long now= System.currentTimeMillis();
+
+//            System.out.println(deal);
+//            System.out.println(now);
+            if(deal<now)
+            {
+                System.out.println("已过期");
+                a.setStatus("已归档");
+                meetService.saveOrUpdate(a);
+            }
+            else
+            {
+                System.out.println("未过期");
+
+            }
+
+            //meetService.update();
+        }
+    }
+
     /**
      * 列表
      */
     @RequestMapping("/list")
     @RequiresPermissions("meeting:meet:list")
     public R list(@RequestParam Map<String, Object> params) {
+        deal();
         SysUserEntity user_now = (SysUserEntity) SecurityUtils.getSubject().getPrincipal();
-        QueryWrapper<SysUserRoleEntity> qe=new QueryWrapper<>();
-        qe.eq("user_id",user_now.getUserId());
+        QueryWrapper<SysUserRoleEntity> qe = new QueryWrapper<>();
+        qe.eq("user_id", user_now.getUserId());
 
-        if(!(user_now.getUsername().equals("admin"))&& sysUserRoleService.getOne(qe).getRoleId()!=1)
-        {
-            params.put("name",user_now.getThename());
+        if (!(user_now.getUsername().equals("admin")) && sysUserRoleService.getOne(qe).getRoleId() != 1) {
+            params.put("name", user_now.getThename());
         }
         PageUtils page = meetService.queryPage(params);
         return R.ok().put("page", page);
@@ -66,17 +112,18 @@ public class MeetController {
 
     /**
      * 历史列表
+     * '
      */
     @RequestMapping("/historylist")
     @RequiresPermissions("meeting:meet:list")
     public R historylist(@RequestParam Map<String, Object> params) {
+        deal();
         SysUserEntity user_now = (SysUserEntity) SecurityUtils.getSubject().getPrincipal();
-        QueryWrapper<SysUserRoleEntity> qe=new QueryWrapper<>();
-        qe.eq("user_id",user_now.getUserId());
+        QueryWrapper<SysUserRoleEntity> qe = new QueryWrapper<>();
+        qe.eq("user_id", user_now.getUserId());
 
-        if(!(user_now.getUsername().equals("admin"))&& sysUserRoleService.getOne(qe).getRoleId()!=1)
-        {
-            params.put("name",user_now.getThename());
+        if (!(user_now.getUsername().equals("admin")) && sysUserRoleService.getOne(qe).getRoleId() != 1) {
+            params.put("name", user_now.getThename());
         }
         PageUtils page = meetService.queryHistoryPage(params);
         return R.ok().put("page", page);
@@ -87,26 +134,26 @@ public class MeetController {
      */
     @RequestMapping("/submit")
     @RequiresPermissions("meeting:meet:list")
-    public R submit(@RequestBody HashMap<String, Object> params)throws Exception{
-        MeetEntity meetRequest=new MeetEntity();
-        meetRequest.setDepartment( params.get("department").toString());
-        meetRequest.setUserFrom( params.get("from").toString());
-        meetRequest.setRoomUser( params.get("name").toString());
-        meetRequest.setRoomName( params.get("room").toString());
-        meetRequest.setEquipment( params.get("equipment").toString().replace("[","").replace("]",""));
+    public R submit(@RequestBody HashMap<String, Object> params) throws Exception {
+        MeetEntity meetRequest = new MeetEntity();
+        meetRequest.setDepartment(params.get("department").toString());
+        meetRequest.setUserFrom(params.get("from").toString());
+        meetRequest.setRoomUser(params.get("name").toString());
+        meetRequest.setRoomName(params.get("room").toString());
+        meetRequest.setEquipment(params.get("equipment").toString().replace("[", "").replace("]", ""));
         meetRequest.setUserPhone(params.get("mobile").toString());
-        String datenow= params.get("datechoose").toString();
-        String datestart=params.get("date1").toString().split(":")[0];
-        String dateend=params.get("date2").toString().split(":")[0];
+        String datenow = params.get("datechoose").toString();
+        String datestart = params.get("date1").toString().split(":")[0];
+        String dateend = params.get("date2").toString().split(":")[0];
         meetRequest.setDate(datenow);
         meetRequest.setStartTime(datestart);
         meetRequest.setEndTime(dateend);
         meetRequest.setUserNum(Integer.parseInt(params.get("sum").toString()));
-        meetRequest.setUsers( params.get("leader").toString());
-        meetRequest.setMeetingTheme( params.get("theme").toString().replace("[","").replace("]",""));
+        meetRequest.setUsers(params.get("leader").toString());
+        meetRequest.setMeetingTheme(params.get("theme").toString().replace("[", "").replace("]", ""));
         meetRequest.setStatus("已申请");
-        if(params.get("note")!=null)
-            meetRequest.setRemark( params.get("note").toString());
+        if (params.get("note") != null)
+            meetRequest.setRemark(params.get("note").toString());
         else
             meetRequest.setRemark("无");
         meetService.save(meetRequest);
@@ -136,7 +183,7 @@ public class MeetController {
             Map map = new HashMap();
             for (int j = 0; j <= room.size(); j++) {
                 if (j != 0) {
-                    map.put(room.get(j-1).getRoomName(), room.get(j-1));
+                    map.put(room.get(j - 1).getRoomName(), room.get(j - 1));
                 } else {
                     map.put("date", i + ":00-" + (i + 1) + ":00");
                 }
@@ -144,10 +191,10 @@ public class MeetController {
             table.add(map);
         }
 
-        List<MeetEntity> chooselist  = meetService.getBaseMapper().selectList(qe);
+        List<MeetEntity> chooselist = meetService.getBaseMapper().selectList(qe);
         for (int i = 0; i < chooselist.size(); i++) {
-            for (int j = Integer.parseInt(chooselist.get(i).getStartTime())-7; j < Integer.parseInt(chooselist.get(i).getEndTime())-7; j++) {
-                table.get(j).put(chooselist.get(i).getRoomName(),chooselist.get(i));
+            for (int j = Integer.parseInt(chooselist.get(i).getStartTime()) - 7; j < Integer.parseInt(chooselist.get(i).getEndTime()) - 7; j++) {
+                table.get(j).put(chooselist.get(i).getRoomName(), chooselist.get(i));
             }
         }
 
