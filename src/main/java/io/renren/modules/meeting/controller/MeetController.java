@@ -1,5 +1,6 @@
 package io.renren.modules.meeting.controller;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -50,6 +51,38 @@ public class MeetController {
     }
 
     /**
+     * 表单提交
+     */
+    @RequestMapping("/submit")
+    @RequiresPermissions("meeting:meet:list")
+    public R submit(@RequestBody HashMap<String, Object> params)throws Exception{
+        MeetEntity meetRequest=new MeetEntity();
+        meetRequest.setDepartment( params.get("department").toString());
+        meetRequest.setUserFrom( params.get("from").toString());
+        meetRequest.setRoomUser( params.get("name").toString());
+        meetRequest.setRoomName( params.get("room").toString());
+        meetRequest.setEquipment( params.get("equipment").toString().replace("[","").replace("]",""));
+        meetRequest.setUserPhone(params.get("mobile").toString());
+        String datenow= params.get("datechoose").toString();
+        String datestart=params.get("date1").toString().split(":")[0];
+        String dateend=params.get("date2").toString().split(":")[0];
+        meetRequest.setDate(datenow);
+        meetRequest.setStartTime(datestart);
+        meetRequest.setEndTime(dateend);
+        meetRequest.setUserNum(Integer.parseInt(params.get("sum").toString()));
+        meetRequest.setUsers( params.get("leader").toString());
+        meetRequest.setMeetingTheme( params.get("theme").toString().replace("[","").replace("]",""));
+        meetRequest.setStatus("已申请");
+        if(params.get("note")!=null)
+            meetRequest.setRemark( params.get("note").toString());
+        else
+            meetRequest.setRemark("无");
+        meetService.save(meetRequest);
+
+        return R.ok();
+    }
+
+    /**
      * 表格//维护一个日期为参数的二维list
      */
     @RequestMapping("/table")
@@ -69,7 +102,7 @@ public class MeetController {
 
         for (int i = 7; i < 21; i++) {
             Map map = new HashMap();
-            for (int j = 0; j < room.size(); j++) {
+            for (int j = 0; j <= room.size(); j++) {
                 if (j != 0) {
                     map.put(room.get(j-1).getRoomName(), room.get(j-1));
                 } else {

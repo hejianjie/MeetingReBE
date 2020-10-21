@@ -68,7 +68,6 @@ public class MeetRoomController {
      * 设备列表
      */
     @RequestMapping("/eqlist")
-    @RequiresPermissions("meeting:meetroom:info")
     public R eqlist(){
         List<MeetRoomEquipmentEntity> eqList=meetRoomEquipmentService.list();
         return R.ok().put("eqList", eqList);
