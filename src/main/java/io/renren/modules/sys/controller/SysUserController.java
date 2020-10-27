@@ -16,6 +16,7 @@ import io.renren.common.validator.Assert;
 import io.renren.common.validator.ValidatorUtils;
 import io.renren.common.validator.group.AddGroup;
 import io.renren.common.validator.group.UpdateGroup;
+import io.renren.modules.app.annotation.Login;
 import io.renren.modules.sys.entity.SysUserEntity;
 import io.renren.modules.sys.form.PasswordForm;
 import io.renren.modules.sys.service.SysUserRoleService;
@@ -117,7 +118,8 @@ public class SysUserController extends AbstractController {
 		
 		return R.ok();
 	}
-	
+
+
 	/**
 	 * 修改用户
 	 */
