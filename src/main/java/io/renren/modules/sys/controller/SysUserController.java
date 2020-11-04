@@ -26,6 +26,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -58,7 +59,31 @@ public class SysUserController extends AbstractController {
 
 		return R.ok().put("page", page);
 	}
-	
+
+
+	/**
+	 * 批量上传
+	 */
+
+	@PostMapping("/excelupdate")
+	public boolean excelpdate(@RequestParam("file") MultipartFile file) throws Exception {
+		String originalFilename = file.getOriginalFilename();
+		System.out.println(originalFilename);
+		System.out.println(file);
+		System.out.println("hhhhhh");
+		sysUserService.batchImport(originalFilename,file);
+//		boolean a = false;
+//		String fileName = file.getOriginalFilename();
+//		try {
+//			a = testService.batchImport(fileName, file);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//		return  a;
+		return false;
+	}
+
+
 	/**
 	 * 获取登录的用户信息
 	 */
