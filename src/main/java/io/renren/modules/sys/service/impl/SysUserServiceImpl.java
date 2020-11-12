@@ -67,7 +67,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> i
 		IPage<SysUserEntity> page = this.page(
 			new Query<SysUserEntity>().getPage(params),
 			new QueryWrapper<SysUserEntity>()
-				.like(StringUtils.isNotBlank(username),"username", username)
+					.like(StringUtils.isNotBlank(username),"thename", username)
 				.eq(createUserId != null,"create_user_id", createUserId)
 		);
 
