@@ -172,19 +172,19 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> i
 
 			user = new SysUserEntity();
 
-			if( row.getCell(0).getCellType() !=1){
+			if( row.getCell(1).getCellType() !=1){
 
 				throw new Exception("导入失败(第"+(r+1)+"行,姓名请设为文本格式)");
 			}
-			String name = row.getCell(0).getStringCellValue();
+			String name = row.getCell(1).getStringCellValue();
 			if(name == null || name.isEmpty()){
 				throw new Exception("导入失败(第"+(r+1)+"行,姓名未填写)");
 			}
 
 
 			String dep;
-			row.getCell(1).setCellType(Cell.CELL_TYPE_STRING);
-			String phone = row.getCell(1).getStringCellValue();
+			row.getCell(3).setCellType(Cell.CELL_TYPE_STRING);
+			String phone = row.getCell(3).getStringCellValue();
 
 			if(phone==null || phone.isEmpty()){
 				throw new Exception("导入失败(第"+(r+1)+"行,电话未填写)");
@@ -196,7 +196,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserDao, SysUserEntity> i
 				dep = row.getCell(2).getStringCellValue();
 			}
 //用户名
-			String username = row.getCell(3).getStringCellValue();
+			if(row.getCell(0)!=null){
+				row.getCell(0).setCellType(Cell.CELL_TYPE_STRING);
+				user.setUsername(row.getCell(0).getStringCellValue());
+			}
+			String username = row.getCell(0).getStringCellValue();
 			if(username==null || username.isEmpty()){
 				throw new Exception("导入失败(第"+(r+3)+"行,用户名未填写)");
 			}
