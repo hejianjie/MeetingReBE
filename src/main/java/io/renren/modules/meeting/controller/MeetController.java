@@ -7,6 +7,7 @@ import java.util.*;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import io.renren.modules.meeting.entity.MeetRoomEntity;
 import io.renren.modules.meeting.service.MeetRoomService;
+import io.renren.modules.meeting.service.ownimpl.Getechart;
 import io.renren.modules.sys.entity.SysRoleEntity;
 import io.renren.modules.sys.entity.SysUserEntity;
 import io.renren.modules.sys.entity.SysUserRoleEntity;
@@ -44,7 +45,8 @@ public class MeetController {
     private SysUserService sysUserService;
     @Autowired
     private SysUserRoleService sysUserRoleService;
-
+    @Autowired
+    private Getechart getechart;
 
     public void deal() {
         Date date = new Date();
@@ -88,6 +90,43 @@ public class MeetController {
 
             //meetService.update();
         }
+    }
+
+
+
+
+    /**
+     * Echart图表数据
+     */
+    @RequestMapping("/echart")
+    public R echart() {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        Calendar c = Calendar.getInstance();
+
+        c.setTime(new Date());
+        c.add(Calendar.DATE, - 7);
+        Date d = c.getTime();
+        String day = format.format(d);
+        System.out.println("过去七天："+day);
+
+        c.setTime(new Date());
+        c.add(Calendar.DATE, - 14);
+        Date d2 = c.getTime();
+        String day2 = format.format(d2);
+        System.out.println("过去十四天："+day2);
+
+        //过去一月
+        c.setTime(new Date());
+        c.add(Calendar.MONTH, -1);
+        Date m = c.getTime();
+        String mon = format.format(m);
+        System.out.println("过去一个月："+mon);
+
+        List<Map<String, Object>> list = new ArrayList<>();
+        System.out.println(getechart.getalldata(day));
+
+        return R.ok().put("day7",getechart.getalldata(day)).put("day14",getechart.getalldata(day2)).put("mon",getechart.getalldata(mon));
+
     }
 
     /**
