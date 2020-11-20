@@ -1,5 +1,6 @@
 package io.renren.modules.meeting.controller;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -23,10 +24,7 @@ import io.renren.common.utils.PageUtils;
 import io.renren.common.utils.R;
 
 
-
 /**
- * 
- *
  * @author hejianjie
  * @email 1805399513@qq.com
  * @date 2020-10-19 15:58:11
@@ -46,7 +44,7 @@ public class MeetRoomController {
      */
     @RequestMapping("/list")
     @RequiresPermissions("meeting:meetroom:list")
-    public R list(@RequestParam Map<String, Object> params){
+    public R list(@RequestParam Map<String, Object> params) {
         PageUtils page = meetRoomService.queryPage(params);
 
         return R.ok().put("page", page);
@@ -58,9 +56,9 @@ public class MeetRoomController {
      */
     @RequestMapping("/info/{roomId}")
     @RequiresPermissions("meeting:meetroom:info")
-    public R info(@PathVariable("roomId") Integer roomId){
-		MeetRoomEntity meetRoom = meetRoomService.getById(roomId);
-        List<MeetRoomEquipmentEntity> eqIdList=meetRoomEquipmentService.list();
+    public R info(@PathVariable("roomId") Integer roomId) {
+        MeetRoomEntity meetRoom = meetRoomService.getById(roomId);
+        List<MeetRoomEquipmentEntity> eqIdList = meetRoomEquipmentService.list();
         return R.ok().put("meetRoom", meetRoom).put("meetRoom", meetRoom);
     }
 
@@ -68,28 +66,55 @@ public class MeetRoomController {
      * 设备列表
      */
     @RequestMapping("/eqlist")
-    public R eqlist(){
-        List<MeetRoomEquipmentEntity> eqList=meetRoomEquipmentService.list();
+    public R eqlist() {
+        List<MeetRoomEquipmentEntity> eqList = meetRoomEquipmentService.list();
         return R.ok().put("eqList", eqList);
     }
+
+    /**
+     * 设备检查
+     */
+    public String equipmentcheck(String equipment) {
+        String[] eqlist = equipment.split(",");
+        List<String> a = new ArrayList<>();
+        String checkedeq = "";
+        for (int i = 0; i < eqlist.length; i++) {
+            if (eqlist[i].equals(""))
+                continue;
+            a.add(eqlist[i]);
+        }
+        for (int i = 0; i < a.size(); i++) {
+            checkedeq += a.get(i) + ",";
+        }
+        if (checkedeq.equals(""))
+            return checkedeq;
+        else {
+            checkedeq = checkedeq.substring(0, checkedeq.length() - 1);
+            return checkedeq;
+        }
+    }
+
 
     /**
      * 保存
      */
     @RequestMapping("/save")
     @RequiresPermissions("meeting:meetroom:save")
-    public R save(@RequestBody MeetRoomEntity meetRoom){
-		meetRoomService.save(meetRoom);
-        String[] eqlist= meetRoomService.getById( meetRoom.getRoomId()).getEquipment().split(",");
-        QueryWrapper<MeetMEEntity> qe=new QueryWrapper<>();
-        qe.eq("r_id",meetRoom.getRoomId());
+    public R save(@RequestBody MeetRoomEntity meetRoom) {
+
+        String check = equipmentcheck(meetRoom.getEquipment());
+        meetRoom.setEquipment(check);
+
+        meetRoomService.save(meetRoom);
+        String[] eqlist = meetRoomService.getById(meetRoom.getRoomId()).getEquipment().split(",");
+        QueryWrapper<MeetMEEntity> qe = new QueryWrapper<>();
+        qe.eq("r_id", meetRoom.getRoomId());
         meetMEService.remove(qe);
-        for(int i=0;i<eqlist.length;i++)
-        {
-            QueryWrapper<MeetRoomEquipmentEntity> qe1=new QueryWrapper<>();
-            qe1.eq("name",eqlist[i]);
-            MeetMEEntity a=new MeetMEEntity();
-            a.setRId( meetRoom.getRoomId());
+        for (int i = 0; i < eqlist.length; i++) {
+            QueryWrapper<MeetRoomEquipmentEntity> qe1 = new QueryWrapper<>();
+            qe1.eq("name", eqlist[i]);
+            MeetMEEntity a = new MeetMEEntity();
+            a.setRId(meetRoom.getRoomId());
             a.setEId(meetRoomEquipmentService.getOne(qe1).getId());
             meetMEService.save(a);
         }
@@ -101,19 +126,23 @@ public class MeetRoomController {
      */
     @RequestMapping("/update")
     @RequiresPermissions("meeting:meetroom:update")
-    public R update(@RequestBody MeetRoomEntity meetRoom){
-		meetRoomService.updateById(meetRoom);
+    public R update(@RequestBody MeetRoomEntity meetRoom) {
 
-        String[] eqlist= meetRoomService.getById( meetRoom.getRoomId()).getEquipment().split(",");
-        QueryWrapper<MeetMEEntity> qe=new QueryWrapper<>();
-        qe.eq("r_id",meetRoom.getRoomId());
+        String check = equipmentcheck(meetRoom.getEquipment());
+        meetRoom.setEquipment(check);
+
+        meetRoomService.updateById(meetRoom);
+        String[] eqlist = meetRoomService.getById(meetRoom.getRoomId()).getEquipment().split(",");
+        QueryWrapper<MeetMEEntity> qe = new QueryWrapper<>();
+        qe.eq("r_id", meetRoom.getRoomId());
         meetMEService.remove(qe);
-        for(int i=0;i<eqlist.length;i++)
-        {
-            QueryWrapper<MeetRoomEquipmentEntity> qe1=new QueryWrapper<>();
-            qe1.eq("name",eqlist[i]);
-            MeetMEEntity a=new MeetMEEntity();
-            a.setRId( meetRoom.getRoomId());
+        for (int i = 0; i < eqlist.length; i++) {
+            if (eqlist[i].equals(""))
+                continue;
+            QueryWrapper<MeetRoomEquipmentEntity> qe1 = new QueryWrapper<>();
+            qe1.eq("name", eqlist[i]);
+            MeetMEEntity a = new MeetMEEntity();
+            a.setRId(meetRoom.getRoomId());
             a.setEId(meetRoomEquipmentService.getOne(qe1).getId());
             meetMEService.save(a);
         }
@@ -125,12 +154,11 @@ public class MeetRoomController {
      */
     @RequestMapping("/delete")
     @RequiresPermissions("meeting:meetroom:delete")
-    public R delete(@RequestBody Integer[] roomIds){
-		meetRoomService.removeByIds(Arrays.asList(roomIds));
-		for(int i=0;i<Arrays.asList(roomIds).size();i++)
-        {
-            QueryWrapper<MeetMEEntity> qe=new QueryWrapper<>();
-            qe.eq("r_id",Arrays.asList(roomIds).get(i));
+    public R delete(@RequestBody Integer[] roomIds) {
+        meetRoomService.removeByIds(Arrays.asList(roomIds));
+        for (int i = 0; i < Arrays.asList(roomIds).size(); i++) {
+            QueryWrapper<MeetMEEntity> qe = new QueryWrapper<>();
+            qe.eq("r_id", Arrays.asList(roomIds).get(i));
             meetMEService.remove(qe);
         }
 
