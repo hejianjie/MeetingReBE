@@ -87,10 +87,9 @@ public class MeetRoomController {
             checkedeq += a.get(i) + ",";
         }
         if (checkedeq.equals("")) {
-            checkedeq ="无";
+            checkedeq = "无";
             return checkedeq;
-        }
-        else {
+        } else {
             checkedeq = checkedeq.substring(0, checkedeq.length() - 1);
             return checkedeq;
         }
@@ -108,17 +107,19 @@ public class MeetRoomController {
         meetRoom.setEquipment(check);
 
         meetRoomService.save(meetRoom);
-        String[] eqlist = meetRoomService.getById(meetRoom.getRoomId()).getEquipment().split(",");
-        QueryWrapper<MeetMEEntity> qe = new QueryWrapper<>();
-        qe.eq("r_id", meetRoom.getRoomId());
-        meetMEService.remove(qe);
-        for (int i = 0; i < eqlist.length; i++) {
-            QueryWrapper<MeetRoomEquipmentEntity> qe1 = new QueryWrapper<>();
-            qe1.eq("name", eqlist[i]);
-            MeetMEEntity a = new MeetMEEntity();
-            a.setRId(meetRoom.getRoomId());
-            a.setEId(meetRoomEquipmentService.getOne(qe1).getId());
-            meetMEService.save(a);
+        if (!meetRoom.getEquipment().equals("无")) {
+            String[] eqlist = meetRoomService.getById(meetRoom.getRoomId()).getEquipment().split(",");
+            QueryWrapper<MeetMEEntity> qe = new QueryWrapper<>();
+            qe.eq("r_id", meetRoom.getRoomId());
+            meetMEService.remove(qe);
+            for (int i = 0; i < eqlist.length; i++) {
+                QueryWrapper<MeetRoomEquipmentEntity> qe1 = new QueryWrapper<>();
+                qe1.eq("name", eqlist[i]);
+                MeetMEEntity a = new MeetMEEntity();
+                a.setRId(meetRoom.getRoomId());
+                a.setEId(meetRoomEquipmentService.getOne(qe1).getId());
+                meetMEService.save(a);
+            }
         }
         return R.ok();
     }
@@ -134,19 +135,21 @@ public class MeetRoomController {
         meetRoom.setEquipment(check);
 
         meetRoomService.updateById(meetRoom);
-        String[] eqlist = meetRoomService.getById(meetRoom.getRoomId()).getEquipment().split(",");
-        QueryWrapper<MeetMEEntity> qe = new QueryWrapper<>();
-        qe.eq("r_id", meetRoom.getRoomId());
-        meetMEService.remove(qe);
-        for (int i = 0; i < eqlist.length; i++) {
-            if (eqlist[i].equals(""))
-                continue;
-            QueryWrapper<MeetRoomEquipmentEntity> qe1 = new QueryWrapper<>();
-            qe1.eq("name", eqlist[i]);
-            MeetMEEntity a = new MeetMEEntity();
-            a.setRId(meetRoom.getRoomId());
-            a.setEId(meetRoomEquipmentService.getOne(qe1).getId());
-            meetMEService.save(a);
+        if (!meetRoom.getEquipment().equals("无")) {
+            String[] eqlist = meetRoomService.getById(meetRoom.getRoomId()).getEquipment().split(",");
+            QueryWrapper<MeetMEEntity> qe = new QueryWrapper<>();
+            qe.eq("r_id", meetRoom.getRoomId());
+            meetMEService.remove(qe);
+            for (int i = 0; i < eqlist.length; i++) {
+                if (eqlist[i].equals(""))
+                    continue;
+                QueryWrapper<MeetRoomEquipmentEntity> qe1 = new QueryWrapper<>();
+                qe1.eq("name", eqlist[i]);
+                MeetMEEntity a = new MeetMEEntity();
+                a.setRId(meetRoom.getRoomId());
+                a.setEId(meetRoomEquipmentService.getOne(qe1).getId());
+                meetMEService.save(a);
+            }
         }
         return R.ok();
     }
