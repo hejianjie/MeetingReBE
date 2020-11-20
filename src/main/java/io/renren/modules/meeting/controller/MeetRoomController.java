@@ -86,8 +86,10 @@ public class MeetRoomController {
         for (int i = 0; i < a.size(); i++) {
             checkedeq += a.get(i) + ",";
         }
-        if (checkedeq.equals(""))
+        if (checkedeq.equals("")) {
+            checkedeq ="无";
             return checkedeq;
+        }
         else {
             checkedeq = checkedeq.substring(0, checkedeq.length() - 1);
             return checkedeq;
