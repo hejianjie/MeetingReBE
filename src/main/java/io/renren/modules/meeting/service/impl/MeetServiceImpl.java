@@ -30,8 +30,12 @@ public class MeetServiceImpl extends ServiceImpl<MeetDao, MeetEntity> implements
                 new QueryWrapper<MeetEntity>()
                         .like("room_user", name)
                         .eq("status", "已申请")
-                        .like(StringUtils.isNotBlank(key), "room_name", key)
                         .like("date", date)
+                        .and(wrapper ->
+                                wrapper.like(StringUtils.isNotBlank(key), "room_name", key)
+                                        .or()
+                                        .like("room_user", key))
+
         );
 
         return new PageUtils(page);
@@ -47,8 +51,11 @@ public class MeetServiceImpl extends ServiceImpl<MeetDao, MeetEntity> implements
                 new QueryWrapper<MeetEntity>()
                         .like("room_user", name)
                         .eq("status", "已归档")
-                        .like(StringUtils.isNotBlank(key), "room_name", key)
                         .like("date", date)
+                        .and(wrapper ->
+                                wrapper.like(StringUtils.isNotBlank(key), "room_name", key)
+                                        .or()
+                                        .like("room_user", key))
         );
 
         return new PageUtils(page);
