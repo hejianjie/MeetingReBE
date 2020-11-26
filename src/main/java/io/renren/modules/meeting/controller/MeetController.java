@@ -188,7 +188,10 @@ public class MeetController {
         meetRequest.setStartTime(datestart);
         meetRequest.setEndTime(dateend);
         meetRequest.setUserNum(Integer.parseInt(params.get("sum").toString()));
-        meetRequest.setUsers(params.get("leader").toString());
+        String leaderstr=params.get("leader").toString();
+        if(leaderstr.equals(""))
+            leaderstr="无";
+        meetRequest.setUsers(leaderstr);
         meetRequest.setMeetingTheme(params.get("theme").toString().replace("[", "").replace("]", ""));
         meetRequest.setStatus("已申请");
         if (params.get("note") != null)
