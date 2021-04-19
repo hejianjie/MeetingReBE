@@ -65,5 +65,5 @@ public interface SysUserService extends IService<SysUserEntity> {
 	 */
 	boolean updatePassword(Long userId, String password, String newPassword);
 
-	boolean batchImport(String fileName,MultipartFile file) throws Exception;
+	String batchImport(String fileName,MultipartFile file) throws Exception;
 }
